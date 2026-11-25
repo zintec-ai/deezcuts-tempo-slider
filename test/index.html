@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Tempo slider test page</title>
+  <style>
+    body { font: 14px/1.4 system-ui, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+    iframe { display: block; margin: 0.5rem 0 2rem; }
+  </style>
+</head>
+<body>
+  <h1>Tempo slider test page</h1>
+  <p>Load the extension, then press play in a widget. Open the developer tools
+    and look for <code>[tempo-slider]</code> messages in the console of the widget frame.</p>
+
+  <h2>Classic widget (166 px), example track from the Widget API docs</h2>
+  <iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay"
+    src="https://w.soundcloud.com/player/?url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F293&amp;show_artwork=true"></iframe>
+
+  <h2>Visual widget (300 px)</h2>
+  <iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay"
+    src="https://w.soundcloud.com/player/?url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F293&amp;visual=true"></iframe>
+</body>
+</html>

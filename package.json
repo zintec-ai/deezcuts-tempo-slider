@@ -1,0 +1,17 @@
+{
+  "name": "deezcuts-tempo-slider",
+  "version": "0.6.0",
+  "private": true,
+  "description": "Browser extension (Chrome and Firefox) that adds a tempo slider to the SoundCloud embed widget.",
+  "type": "module",
+  "scripts": {
+    "icons": "node scripts/make_icons.mjs",
+    "build": "node scripts/build.mjs",
+    "lint": "npm run build -- firefox && web-ext lint --source-dir dist/firefox",
+    "serve": "node scripts/serve.mjs",
+    "package": "npm run build && web-ext build --source-dir dist/firefox --artifacts-dir packages --filename firefox-{version}.zip --overwrite-dest && web-ext build --source-dir dist/chrome --artifacts-dir packages --filename chrome-{version}.zip --overwrite-dest"
+  },
+  "devDependencies": {
+    "web-ext": "^10.8.0"
+  }
+}

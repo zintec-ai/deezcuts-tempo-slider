@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "Deezcuts Tempo Slider",
+  "description": "Adds a tempo (BPM) slider to embedded SoundCloud players and to the deezcuts.io player. Not affiliated with SoundCloud.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://w.soundcloud.com/player/*"
+      ],
+      "js": [
+        "main_world.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true,
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://w.soundcloud.com/player/*"
+      ],
+      "js": [
+        "protocol.js",
+        "panel.js",
+        "ui.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
+    },
+    {
+      "matches": [
+        "https://deezcuts.io/*",
+        "https://*.deezcuts.io/*"
+      ],
+      "js": [
+        "protocol.js",
+        "fader.js",
+        "site_controller.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
