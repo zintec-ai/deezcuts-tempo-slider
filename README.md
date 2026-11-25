@@ -131,8 +131,7 @@ icons-src/         SVG sources of the icons (the deezcuts.io logo)
 chrome/            manifest.override.json for Chrome, Edge, Brave, Opera, Vivaldi
 firefox/           manifest.override.json for Firefox desktop and Android
 scripts/           Node script: build
-store/             Texts for the store listings
-store/promo/       Promo tiles: HTML sources, render.py, and the PNG files
+store/promo/       Promo tiles and screenshots: HTML sources, render.py, images
 LICENSE            MIT license (the code only, not the logo)
 PRIVACY.md         Privacy policy (the store listings link to it)
 dist/              Build output (not in git)
@@ -246,8 +245,7 @@ Do these steps for each release:
 
 ### Chrome Web Store
 
-The listing texts and the answers for the privacy tab are in
-`store/chrome-web-store.md`. The privacy policy is `PRIVACY.md`.
+The privacy policy is `PRIVACY.md`.
 
 This one store is for Chrome. Edge, Brave, Opera, and Vivaldi can also
 install from it. Edge also has its own store (Microsoft Partner Center).
@@ -266,8 +264,7 @@ Microsoft charges no registration fee. You can upload the same ZIP file there.
      the PNG files in `store/promo/`.
 4. Complete the "Privacy practices" tab: single purpose, a justification for
    the host access, "no remote code", and the data usage ("Website content"
-   only). Use the privacy policy URL of `PRIVACY.md` on GitHub. The exact
-   texts are in `store/chrome-web-store.md`.
+   only). Use the privacy policy URL of `PRIVACY.md` on GitHub.
 5. Submit for review. Review usually takes a few days. It can take up to a
    few weeks.
 
@@ -302,10 +299,12 @@ SoundCloud or Pioneer DJ logo in the icon or in the screenshots.
 - Change the Firefox add-on ID (see above).
 - Do the test procedure in Chrome and in Firefox.
 
-## License
+## License and trademarks
 
 The code is under the MIT license. See `LICENSE`.
 
-The deezcuts.io logo (in `icons-src/`, `tempo_core/icons/` and
-`store/promo/`) is not under the MIT license. Do not use the logo for other
-products.
+"deezcuts", "DeezCuts", "deezcuts.io" and the DeezCuts logo are the
+intellectual property of Zintec GmbH, Switzerland. The MIT license does not
+give rights to these names or to the logo. The logo is in `icons-src/`,
+`tempo_core/icons/` and `store/promo/`. Do not use the names or the logo for
+other products without written permission from Zintec GmbH.
