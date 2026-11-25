@@ -304,7 +304,8 @@ SoundCloud or Pioneer DJ logo in the icon or in the screenshots.
 The code is under the MIT license. See `LICENSE`.
 
 "deezcuts", "DeezCuts", "deezcuts.io" and the DeezCuts logo are the
-intellectual property of Zintec GmbH, Switzerland. The MIT license does not
+intellectual property of Zintec GmbH, Switzerland. The DeezCuts logo is
+© 2026 Zintec GmbH, Switzerland. All rights reserved. The MIT license does not
 give rights to these names or to the logo. The logo is in `icons-src/`,
 `tempo_core/icons/` and `store/promo/`. Do not use the names or the logo for
 other products without written permission from Zintec GmbH.
