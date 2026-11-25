@@ -3,4 +3,4 @@ dist/
 packages/
 *.zip
 deezcuts_session.txt
-store/chrome-web-store.md
+store/*.md

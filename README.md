@@ -274,10 +274,9 @@ Firefox installs only signed add-ons (except temporary add-ons). The
 Mozilla documentation mentions no fee for signing.
 
 1. Make an account on [addons.mozilla.org](https://addons.mozilla.org/developers/).
-2. Before the first upload, change the add-on ID in
-   `firefox/manifest.override.json` (`tempo-slider@deezcuts.invalid`) to an ID that you
-   own, for example `tempo-slider@your-domain`. Do not change the ID after
-   the first upload.
+2. The add-on ID is `tempo-slider@deezcuts.io` (in
+   `firefox/manifest.override.json`). Do not change the ID after the first
+   upload. AMO identifies the add-on by this ID.
 3. Upload `packages/firefox-<version>.zip`. Select one of these:
    - "On this site" (listed): the add-on shows on AMO.
    - "On your own" (unlisted): Mozilla signs the add-on and you distribute
@@ -296,7 +295,6 @@ SoundCloud or Pioneer DJ logo in the icon or in the screenshots.
 
 ## Before the first release
 
-- Change the Firefox add-on ID (see above).
 - Do the test procedure in Chrome and in Firefox.
 
 ## License and trademarks
