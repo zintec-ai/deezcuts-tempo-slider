@@ -1,7 +1,6 @@
 // Shared constants and helpers for the ISOLATED-world scripts.
 // Content scripts cannot use `import`, so this file defines a global
-// object. The manifest loads it before panel.js, ui.js and
-// site_controller.js.
+// object. The manifest loads it before ui.js and site_controller.js.
 //
 // Messages between a site page (the "controller") and the widget frames
 // use window.postMessage with a string: "tempo-slider:" + JSON.

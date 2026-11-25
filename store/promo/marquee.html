@@ -1,0 +1,36 @@
+<!doctype html>
+<!-- Chrome Web Store marquee promo tile, 1400 x 560 px. Render: python3 store/promo/render.py (see the file header) -->
+<html><head><meta charset="utf-8"><style>
+  html, body { margin: 0; width: 1400px; height: 560px; overflow: hidden; background: #15110d; }
+  body { font-family: Ubuntu, "DejaVu Sans", sans-serif; color: #eae3d2; position: relative; }
+  .logo { position: absolute; left: 80px; top: 70px; height: 84px; }
+  h1 { position: absolute; left: 80px; top: 200px; margin: 0; font-size: 64px; font-weight: 500; }
+  ul { position: absolute; left: 80px; top: 300px; margin: 0; padding: 0; list-style: none; font-size: 26px; line-height: 1.75; color: #c9c2b3; }
+  li::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #f2a03d; margin: 0 16px 3px 0; }
+  .panel { position: absolute; left: 760px; top: 50px; width: 580px; height: 460px; border: 1px solid #3a342c; border-radius: 18px;
+           display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 36px; }
+  .vertical { zoom: 2.1; }
+  .horizontal { zoom: 1.6; }
+</style></head><body>
+  <img class="logo" src="../../icons-src/deezcuts-lockup-on-dark.svg" alt="">
+  <h1>Tempo Fader</h1>
+  <ul>
+    <li>Live BPM while you move the fader</li>
+    <li>Ranges ±6, ±10, ±16 and WIDE</li>
+    <li>Master Tempo key lock</li>
+    <li>Footer player and curate player</li>
+  </ul>
+  <div class="panel">
+    <div class="vertical" id="v"></div>
+    <div class="horizontal" id="h"></div>
+  </div>
+  <script src="../../tempo_core/fader.js"></script>
+  <script>
+    for (const [id, orientation] of [["v", "vertical"], ["h", "horizontal"]]) {
+      const f = TempoFader.create({ orientation, dividers: false });
+      f.set({ pct: 2.5, preservesPitch: true });
+      f.setOriginalBpm(124);
+      document.getElementById(id).append(f.host);
+    }
+  </script>
+</body></html>

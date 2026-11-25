@@ -28,8 +28,12 @@
   const media = new Set();
   let rate = 1;
   let preservesPitch = true;
+  // false until the first rate from a deezcuts.io page arrives. On other
+  // websites, no rate arrives, and the script changes no media element.
+  let active = false;
 
   function applyTo(el) {
+    if (!active) return;
     try {
       if (el.preservesPitch !== preservesPitch) {
         el.preservesPitch = preservesPitch;
@@ -45,6 +49,7 @@
   }
 
   function sendState() {
+    if (!active) return;
     let playing = false;
     for (const el of media) if (!el.paused) playing = true;
     document.dispatchEvent(
@@ -57,7 +62,7 @@
   function track(el) {
     if (!el || media.has(el)) return;
     media.add(el);
-    console.info(TAG, "found media element:", el.tagName, el.isConnected ? "(in DOM)" : "(not in DOM)");
+    if (active) console.info(TAG, "found media element:", el.tagName, el.isConnected ? "(in DOM)" : "(not in DOM)");
     const reapply = () => applyTo(el);
     el.addEventListener("loadedmetadata", reapply);
     el.addEventListener("play", reapply);
@@ -96,6 +101,7 @@
     if (!msg || typeof msg !== "object") return;
     if (typeof msg.rate === "number" && msg.rate >= MIN_RATE && msg.rate <= MAX_RATE) rate = msg.rate;
     if (typeof msg.preservesPitch === "boolean") preservesPitch = msg.preservesPitch;
+    active = true;
     media.forEach(applyTo);
     sendState();
   });
@@ -109,7 +115,7 @@
   // Diagnostic: if the widget plays sound but no element is found, the
   // widget uses Web Audio, and playbackRate cannot change the tempo.
   setTimeout(() => {
-    if (media.size === 0) {
+    if (active && media.size === 0) {
       console.info(TAG, "no media element found yet. Press play in the widget.");
     }
   }, 5000);

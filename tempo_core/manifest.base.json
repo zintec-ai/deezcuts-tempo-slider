@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Deezcuts Tempo Slider",
-  "description": "Adds a tempo (BPM) slider to embedded SoundCloud players and to the deezcuts.io player. Not affiliated with SoundCloud.",
+  "description": "DJ-style tempo fader for the deezcuts.io players: live BPM, ±6/±10/±16/WIDE ranges, and key lock (Master Tempo).",
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",
@@ -26,7 +26,6 @@
       ],
       "js": [
         "protocol.js",
-        "panel.js",
         "ui.js"
       ],
       "run_at": "document_start",

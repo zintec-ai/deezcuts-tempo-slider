@@ -1,24 +1,24 @@
 # Deezcuts Tempo Slider
 
-A browser extension for Chrome-based browsers and Firefox. It adds a tempo
-(BPM) control to the SoundCloud embed widget (the `w.soundcloud.com/player`
-iframe) and to the player on deezcuts.io. The extension is not affiliated
-with SoundCloud.
+A browser extension for Chrome-based browsers and Firefox. It adds a
+DJ-style tempo fader to the players on deezcuts.io. deezcuts.io plays tracks
+through SoundCloud embed widgets (the `w.soundcloud.com/player` iframe), and
+the extension changes the playback speed in these widgets. The extension
+works only on deezcuts.io. It is not affiliated with SoundCloud.
 
 ## How it works
 
 The [SoundCloud Widget API](https://developers.soundcloud.com/docs/api/html5-widget)
 has no method for the playback speed. For this reason, the extension does not
-use the Widget API. It runs content scripts inside the widget iframe and,
-on deezcuts.io, in the page:
+use the Widget API. It runs content scripts inside the widget iframe and in
+the deezcuts.io page:
 
 | File | Where | World | Function |
 |---|---|---|---|
 | `tempo_core/main_world.js` | widget frame | `MAIN` (the page JavaScript context), `document_start` | Finds the media elements of the widget and sets `playbackRate` and `preservesPitch` on them. |
 | `tempo_core/protocol.js` | widget frame, deezcuts.io | `ISOLATED` | Message format and origin checks. |
-| `tempo_core/panel.js` | widget frame | `ISOLATED` | The floating tempo panel for standalone embeds (in a Shadow DOM). |
 | `tempo_core/fader.js` | deezcuts.io top frame | `ISOLATED` | The CDJ-style tempo fader for the deezcuts.io players (in a Shadow DOM). |
-| `tempo_core/ui.js` | widget frame | `ISOLATED` (the extension context), `document_idle` | Bridge. Shows the panel on the widget, or follows a controller page. Sends the rate to `main_world.js`. |
+| `tempo_core/ui.js` | widget frame | `ISOLATED` (the extension context), `document_start` | Bridge. Accepts the rate from a deezcuts.io top page and sends it to `main_world.js`. |
 | `tempo_core/site_controller.js` | deezcuts.io top frame | `ISOLATED`, `document_idle` | Puts a fader into each deezcuts.io player and sends the rate to all widget frames. |
 
 A "content script" is a script that the browser adds to a web page that
@@ -38,19 +38,24 @@ also applies to this output.
 `document`. The event detail is a JSON string, because Firefox blocks
 object access between the two worlds.
 
+The browser runs the widget scripts in every SoundCloud embed, also on
+other websites, because a match pattern cannot check the top page. On other
+websites, no rate arrives from a deezcuts.io page. Then `main_world.js`
+changes no media element, and `ui.js` sends no message.
+
 ### deezcuts.io
 
 deezcuts.io plays tracks through 2 to 4 hidden widget iframes ("decks"). It
 changes between them, and it plays a standby deck muted for a short time to
-prepare it. A panel inside a hidden widget is not visible, so the extension
-works as follows:
+prepare it. The widgets are hidden, so the controls are in the page, and
+the extension works as follows:
 
-1. Each widget frame sends `hello` to the top window.
-2. `site_controller.js` answers with the current rate (`set`).
-3. The frame removes its own panel and uses the rate from the page. It
-   reports its state (`state`: media element count, playing or paused).
-   The page script does not use this state at the moment.
-4. Each change on a fader goes to all widget frames of the page.
+1. `site_controller.js` sends the current rate (`set`) to each widget frame
+   when the frame loads.
+2. The frame uses the rate from the page. It reports its state (`state`:
+   media element count, playing or paused). The page writes a debug log
+   line when the state of a deck changes.
+3. Each change on a fader goes to all widget frames of the page.
 
 The messages use `window.postMessage` with a string
 `tempo-slider:` + JSON. The SoundCloud widget, the SoundCloud `api.js`, and
@@ -65,7 +70,7 @@ to both:
 - the footer player (`footer.dcfp`), on most pages;
 - the large player on `/curate` (`.dchp` in `.dcflow__player`).
 
-The extension puts a tempo fader (`tempo_core/fader.js`) after the volume
+The extension puts a tempo fader (`tempo_core/fader.js`) next to the volume
 slider of each player. The fader looks like the tempo fader of a Pioneer CDJ:
 
 - Large player: a vertical fader. Up is "−" (slower), down is "+" (faster).
@@ -79,11 +84,8 @@ slider of each player. The fader looks like the tempo fader of a Pioneer CDJ:
   move it by one step.
 - "MT" (Master Tempo) is the key lock.
 
-All faders show one tempo state. On deezcuts.io, the extension shows no
-floating panel. If no player is on the page (for example, before the first
-track starts), the extension shows no control. The floating panel
-(`tempo_core/panel.js`) is only for standalone SoundCloud embeds on other
-pages.
+All faders show one tempo state. If no player is on the page (for example,
+before the first track starts), the extension shows no control.
 
 The BPM display needs the BPM of the current track. The extension reads it
 from these sources, in this sequence:
@@ -98,37 +100,41 @@ from these sources, in this sequence:
 On a track change, the tempo percentage stays the same and the BPM display
 changes.
 
-### Controls
-
-- The orange button in the top-right corner of the widget shows the tempo
-  change. Click it to open the panel.
-- Slider: tempo change in percent. The range is ±6 %, ±10 %, ±16 % or
-  ±50 % (WIDE).
-  Double-click the slider to reset it.
-- `−` and `+`: change the tempo in steps of 0.1 %.
-- Key lock: on = the pitch stays the same (time stretch). Off = the pitch
-  changes with the tempo, as on a turntable.
-- BPM: the extension cannot detect the BPM of a track. Type the original BPM.
-  The extension then shows the target BPM. You can also type a target BPM.
-
 ### Known limits
 
 - If SoundCloud changes the player, the extension can stop working. Sign of
   this: the track plays, but the console shows no
-  `[tempo-slider] found media element` line, and the panel continues to show
-  "Press play to connect to the player". Check this first when you test.
-- The extension works only on embedded players and on deezcuts.io, not on
-  `soundcloud.com` itself.
+  `[tempo-slider] found media element` line in the widget frame. Check this
+  first when you test.
+- The extension works only on deezcuts.io.
 - The tempo goes back to 0 % when the page loads again.
+
+## Icons
+
+The icons are the deezcuts.io logo on a dark rounded tile. The sources are
+in `icons-src/`:
+
+- `icon-small.svg`: the 16 px icon. It has no grooves, because they are not
+  clear at 16 px.
+- `icon.svg`: the 32 px and 48 px icons.
+- `icon-store.svg`: the 128 px icon. The tile is 96 × 96 px, with 16 px of
+  transparent padding at each side, as the Chrome Web Store requires.
+
+To change an icon, export the SVG to a PNG of the correct size with
+transparency, and replace the file in `tempo_core/icons/`.
 
 ## Project layout
 
 ```
 tempo_core/        Shared code, icons, and manifest.base.json (all browsers)
+icons-src/         SVG sources of the icons (the deezcuts.io logo)
 chrome/            manifest.override.json for Chrome, Edge, Brave, Opera, Vivaldi
 firefox/           manifest.override.json for Firefox desktop and Android
-scripts/           Node scripts: build, icons, test server
-test/index.html    Test page with two embedded widgets
+scripts/           Node script: build
+store/             Texts for the store listings
+store/promo/       Promo tiles: HTML sources, render.py, and the PNG files
+LICENSE            MIT license (the code only, not the logo)
+PRIVACY.md         Privacy policy (the store listings link to it)
 dist/              Build output (not in git)
 packages/          ZIP files for the stores (not in git)
 ```
@@ -167,10 +173,7 @@ All scripts are Node scripts. They run on Windows, macOS, and Linux.
 npm install          # installs web-ext (Mozilla's extension tool)
 npm run build        # writes dist/chrome and dist/firefox
 npm run lint         # builds Firefox and runs the AMO validator
-npm run serve        # serves the test page at http://localhost:8080/ (or the next free port)
-npm run serve -- --port 9000   # starts at a different port
 npm run package      # writes packages/chrome-<version>.zip and packages/firefox-<version>.zip
-npm run icons        # writes placeholder icons to tempo_core/icons/
 ```
 
 ## Test the extension locally
@@ -202,21 +205,22 @@ macOS with a local Firefox, you can also use
 `npx web-ext run --source-dir dist/firefox`. This was not tested on WSL. This command opens a new
 Firefox profile and reloads the add-on when a file changes.
 
-If the button does not show in Firefox, the extension possibly does not
-have access to `w.soundcloud.com`. Do these steps:
+If the fader does not show or the tempo does not change in Firefox, the
+extension possibly does not have access to the sites. Do these steps:
 
 1. Open `about:addons`.
 2. Click the extension name (not the switch).
 3. Open the "Permissions" tab.
-4. Set the switch for `w.soundcloud.com` to on.
-5. Reload the test page.
+4. Set the switches for `w.soundcloud.com` and `deezcuts.io` to on.
+5. Reload the deezcuts.io page.
 
 ### Test procedure on deezcuts.io
 
 1. Open a track page on deezcuts.io and start the track in the player at
    the bottom.
 2. Make sure that the footer player shows the tempo fader.
-3. Make sure that no floating panel (orange button) shows on the page.
+3. Open a page with an embedded SoundCloud player on a different website.
+   Make sure that the extension shows nothing there.
 4. Set the tempo to +8 %. Make sure that the tempo changes.
 5. Go to the next track. Make sure that the tempo stays at +8 % (the player
    then uses a different deck).
@@ -231,19 +235,6 @@ have access to `w.soundcloud.com`. Do these steps:
 11. Open `/curate` with the BPM fact pinned. Make sure that the fader shows
     the BPM, and that the BPM changes on the next track.
 
-### Test procedure on the test page
-
-1. Run `npm run serve` and open `http://localhost:8080/`.
-2. Make sure that an orange `±0.0%` button shows in the top-right corner of each widget.
-3. Press play in a widget.
-4. Open the developer tools (F12). Select the `w.soundcloud.com` frame in the
-   console (Chrome: the "top" menu. Firefox: the iframe picker icon).
-5. Make sure that the console shows `[tempo-slider] found media element`.
-6. Move the slider. Make sure that the tempo changes.
-7. Set "Key lock" to off. Make sure that the pitch changes with the tempo.
-8. Let the track go to the next track, or click a different track. Make sure
-   that the tempo stays at the selected value.
-
 ## Publish
 
 Do these steps for each release:
@@ -255,6 +246,9 @@ Do these steps for each release:
 
 ### Chrome Web Store
 
+The listing texts and the answers for the privacy tab are in
+`store/chrome-web-store.md`. The privacy policy is `PRIVACY.md`.
+
 This one store is for Chrome. Edge, Brave, Opera, and Vivaldi can also
 install from it. Edge also has its own store (Microsoft Partner Center).
 Microsoft charges no registration fee. You can upload the same ZIP file there.
@@ -265,14 +259,15 @@ Microsoft charges no registration fee. You can upload the same ZIP file there.
    state the amount).
 2. Upload `packages/chrome-<version>.zip`.
 3. Supply the listing assets:
-   - icon: 128×128 px (already in the ZIP);
+   - icon: 128×128 px (`tempo_core/icons/icon128.png`, with 16 px of
+     transparent padding at each side);
    - min. one screenshot: 1280×800 px or 640×400 px;
-   - small promo tile: 440×280 px.
+   - small promo tile (440×280 px) and marquee (1400×560 px, optional):
+     the PNG files in `store/promo/`.
 4. Complete the "Privacy practices" tab: single purpose, a justification for
-   the `w.soundcloud.com` host access, "no remote code", and "no data
-   collected". The dashboard also has a privacy policy URL field. The
-   documentation does not say if you can leave it empty when you collect no
-   data. Check this when you submit.
+   the host access, "no remote code", and the data usage ("Website content"
+   only). Use the privacy policy URL of `PRIVACY.md` on GitHub. The exact
+   texts are in `store/chrome-web-store.md`.
 5. Submit for review. Review usually takes a few days. It can take up to a
    few weeks.
 
@@ -297,12 +292,20 @@ Mozilla documentation mentions no fee for signing.
 
 The Chrome Web Store policy does not permit a product to suggest that
 another company made or supports it. The AMO policy has no specific rule
-for third-party names. For both stores, the name does not start with
-"SoundCloud", and the description says "Not affiliated with SoundCloud".
-Do not use the SoundCloud logo in the icon or in the screenshots.
+for third-party names. For both stores, the name does not contain
+"SoundCloud", "Pioneer" or "CDJ". The store description uses these names
+only to describe the function, and it has a trademark note. Do not use the
+SoundCloud or Pioneer DJ logo in the icon or in the screenshots.
 
 ## Before the first release
 
-- Replace the placeholder icons in `tempo_core/icons/` with real artwork.
 - Change the Firefox add-on ID (see above).
 - Do the test procedure in Chrome and in Firefox.
+
+## License
+
+The code is under the MIT license. See `LICENSE`.
+
+The deezcuts.io logo (in `icons-src/`, `tempo_core/icons/` and
+`store/promo/`) is not under the MIT license. Do not use the logo for other
+products.

@@ -8,7 +8,7 @@
 //   - horizontal, in the footer player between the volume slider and the
 //     queue button, with a vertical bar at each side,
 // - sends each change to all widget frames,
-// - answers the "hello" message of each new frame with the current rate,
+// - sends the current rate to each widget frame when the frame loads,
 // - writes the state reports of the frames to the debug log.
 // If no player is on the page, the script shows no control.
 
@@ -68,7 +68,7 @@
       try {
         // The target origin makes sure that only the SoundCloud widget gets
         // the message. If the frame is still loading, the browser drops the
-        // message, and the "hello" of the frame gets the rate later.
+        // message, and the "load" listener sends the rate later.
         iframe.contentWindow?.postMessage(data, TempoProtocol.WIDGET_ORIGIN);
       } catch {
         /* frame removed */
@@ -79,15 +79,26 @@
   // The last logged state of each deck, by frame ID.
   const deckStates = new Map();
 
-  // A new widget frame says "hello": send it the current rate.
+  // Send the current rate to a widget frame each time that it loads a
+  // document. The bridge in the frame starts at document_start, so it
+  // gets the message.
+  const knownFrames = new WeakSet();
+  function watchFrames() {
+    for (const iframe of document.querySelectorAll(WIDGET_SELECTOR)) {
+      if (knownFrames.has(iframe)) continue;
+      knownFrames.add(iframe);
+      iframe.addEventListener("load", () => {
+        iframe.contentWindow?.postMessage(setMessage(), TempoProtocol.WIDGET_ORIGIN);
+      });
+    }
+  }
+
   // A frame reports its state: write it to the debug log. This helps when
   // a deck does not follow the tempo.
   window.addEventListener("message", (e) => {
-    if (e.origin !== TempoProtocol.WIDGET_ORIGIN || !e.source) return;
+    if (e.origin !== TempoProtocol.WIDGET_ORIGIN) return;
     const msg = TempoProtocol.decode(e.data);
-    if (msg?.type === "hello") {
-      e.source.postMessage(setMessage(), TempoProtocol.WIDGET_ORIGIN);
-    } else if (msg?.type === "state") {
+    if (msg?.type === "state") {
       // Each deck reports after each tempo change. Log only a changed state.
       const line = `${msg.count} media element(s), ${msg.playing ? "playing" : "paused"}`;
       if (deckStates.get(msg.frameId) === line) return;
@@ -144,6 +155,7 @@
 
   // Players, faders and the BPM fact come and go with the page content.
   function refresh() {
+    watchFrames();
     mountFaders();
     watchBpmSources();
     readPageBpm();
@@ -160,7 +172,6 @@
 
   refresh();
 
-  // Frames that loaded before this script ran did send "hello" too early.
-  // Send them the current rate now.
+  // Send the rate to the frames that loaded before this script ran.
   broadcast();
 })();

@@ -1,0 +1,22 @@
+<!doctype html>
+<!-- Chrome Web Store small promo tile, 440 x 280 px. Render: python3 store/promo/render.py (see the file header) -->
+<html><head><meta charset="utf-8"><style>
+  html, body { margin: 0; width: 440px; height: 280px; overflow: hidden; background: #15110d; }
+  body { font-family: Ubuntu, "DejaVu Sans", sans-serif; color: #eae3d2; position: relative; }
+  .logo { position: absolute; left: 28px; top: 24px; height: 46px; }
+  .fader { position: absolute; left: 28px; top: 104px; zoom: 1.35; }
+  h1 { position: absolute; left: 28px; bottom: 44px; margin: 0; font-size: 30px; font-weight: 500; letter-spacing: 0.2px; }
+  p { position: absolute; left: 28px; bottom: 22px; margin: 0; font-size: 14px; color: #f2a03d; }
+</style></head><body>
+  <img class="logo" src="../../icons-src/deezcuts-lockup-on-dark.svg" alt="">
+  <div class="fader" id="fader"></div>
+  <h1>Tempo Fader</h1>
+  <p>Live BPM · ±6 ±10 ±16 WIDE · Key lock</p>
+  <script src="../../tempo_core/fader.js"></script>
+  <script>
+    const f = TempoFader.create({ orientation: "horizontal", dividers: false });
+    f.set({ pct: 2.5, preservesPitch: true });
+    f.setOriginalBpm(124);
+    document.getElementById("fader").append(f.host);
+  </script>
+</body></html>
